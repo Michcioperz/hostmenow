@@ -8,6 +8,7 @@ for addr in filter(lambda x: not x.startswith('127'), filter(None, [item.get('ad
     qr = qrcode.QRCode()
     uri = 'http://{}:{}'.format(addr, args.port)
     qr.add_data(uri)
+    print(uri)
     qr.print_ascii(tty=True)
 
 conffd, conffile = tempfile.mkstemp(suffix="hostmenow")
