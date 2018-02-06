@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
-import argparse, netifaces, tempfile, subprocess, os, qrcode
+import argparse, tempfile, subprocess, os
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--port", type=int, default=5004)
 args = parser.parse_args()
 
-for addr in filter(lambda x: not x.startswith('127'), filter(None, [item.get('addr') for sublist in [netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) for iface in netifaces.interfaces()] for item in sublist])):
-    qr = qrcode.QRCode()
-    uri = 'http://{}:{}'.format(addr, args.port)
-    qr.add_data(uri)
-    print(uri)
-    qr.print_ascii(tty=True)
+try:
+    import netifaces
+    for addr in filter(lambda x: not x.startswith('127'), filter(None, [item.get('addr') for sublist in [netifaces.ifaddresses(iface).get(netifaces.AF_INET, []) for iface in netifaces.interfaces()] for item in sublist])):
+        uri = 'http://{}:{}'.format(addr, args.port)
+        print(uri)
+        try:
+            import qrcode
+            qr = qrcode.QRCode()
+            qr.add_data(uri)
+            qr.print_ascii(tty=True)
+        except ImportError:
+            pass
+except ImportError:
+    pass
 
 conffd, conffile = tempfile.mkstemp(suffix="hostmenow")
 os.close(conffd) # because it's idiotic
